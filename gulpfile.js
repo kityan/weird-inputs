@@ -105,7 +105,7 @@ gulp.task('concatCSS', function () {
 		.pipe(gulpIf('**/*.less', less({}))) 
 		.on('error', swallowError)			
 		.pipe(sourceMaps.init())	
-		.pipe(concat('linechartInput.css'))
+		.pipe(concat('lineChartInput.css'))
 		.pipe(cleanCSS())
 		.pipe(sourceMaps.write())
 		.pipe(gulp.dest('./dist/'));
@@ -118,7 +118,7 @@ gulp.task('concatCSS_production', function () {
 	return gulp.src(files)
 		.pipe(gulpIf('**/*.less', less({}))) 
 		.on('error', swallowError)			
-		.pipe(concat('linechartInput.css'))
+		.pipe(concat('lineChartInput.css'))
 		.pipe(cleanCSS())
 		.pipe(gulp.dest('./dist/'));
 });
