@@ -61,15 +61,18 @@
 				.attr("transform", "translate(" + Math.min(850,200) / 2 + "," + Math.min(850,200) / 2 + ")");
 				*/
 
-				scope.$watchCollection(['data', 'options'], function () {
-					if (!scope.points || !scope.options) { return; }
+
+				function update() {
+					if (!scope.options || !scope.points) { return; }
 					if (!initilazed) {
 						draw();
 					} else {
 						redraw();
 					}
+				}
 
-				}, true);
+				scope.$watch('points', update, true);
+				scope.$watch('options', update, true);
 
 
 				function setChartParameters() {
