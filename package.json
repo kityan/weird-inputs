@@ -1,0 +1,25 @@
+{
+  "name": "weird-inputs",
+  "version": "1.0.1",
+  "private": true,
+  "scripts": {
+    "gulp": "./node_modules/.bin/gulp"
+  },
+  "devDependencies": {
+    "angular": "1.5.8",
+    "d3": "3.5.17",
+    "del": "^2.2.0",
+    "gulp": "^3.9.0",
+    "gulp-clean-css": "^3.0.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^2.2.0",
+    "gulp-if": "^2.0.2",
+    "gulp-less": "^3.3.0",
+    "gulp-open": "^1.0.0",
+    "gulp-replace": "^0.5.4",
+    "gulp-sourcemaps": "^2.2.0",
+    "gulp-uglify": "^1.5.3",
+    "gulp-watch": "^4.3.5",
+    "run-sequence": "^1.2.2"
+  }
+}
