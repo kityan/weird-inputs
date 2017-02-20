@@ -1,5 +1,27 @@
 ;
 (function () {
+
+	// resize detector >
+	function ResizeDetector(element, handler) {
+		this.timeout = 50;
+		this.values = { w: null, h: null }
+		this.element = element || window;
+		this.handler = handler || function () { };
+		setTimeout(this.checker.bind(this), this.timeout);
+	}
+	ResizeDetector.prototype.checker = function () {
+		var w = parseInt(this.element.style('width'));
+		var h = parseInt(this.element.style('height'));
+		if ((this.values.w && this.values.w != w) || (this.values.h && this.values.h != h)) {
+			setTimeout(this.handler.bind(this), 0);
+		}
+		this.values.w = w;
+		this.values.h = h;
+		setTimeout(this.checker.bind(this), this.timeout);
+	}
+	// resize detector <
+
+
 	var app = angular.module('weird-inputs', []);
 	app.directive("lineChartInput", ['$window', '$filter', function ($window, $filter) {
 		return {
@@ -61,6 +83,16 @@
 				.attr("transform", "translate(" + Math.min(850,200) / 2 + "," + Math.min(850,200) / 2 + ")");
 				*/
 
+
+				function onresize() {
+					svgWidth = parseInt(svg.style('width'));
+					svgHeight = parseInt(svg.style('height'));
+					setChartParameters();
+					svg.selectAll('*').remove();
+					draw();
+				}
+
+				new ResizeDetector(svg, onresize);
 
 				function update() {
 					if (!scope.options || !scope.points) { return; }
