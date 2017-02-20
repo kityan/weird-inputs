@@ -4,10 +4,15 @@
 	// resize detector >
 	function ResizeDetector(element, handler) {
 		this.timeout = 50;
+		this.tm = null;
 		this.values = { w: null, h: null }
 		this.element = element || window;
 		this.handler = handler || function () { };
-		setTimeout(this.checker.bind(this), this.timeout);
+		this.tm = setTimeout(this.checker.bind(this), this.timeout);
+		this.rnd = Math.random();
+	}
+	ResizeDetector.prototype.destroy = function () {
+		clearTimeout(this.tm);
 	}
 	ResizeDetector.prototype.checker = function () {
 		var w = parseInt(this.element.style('width'));
@@ -17,7 +22,7 @@
 		}
 		this.values.w = w;
 		this.values.h = h;
-		setTimeout(this.checker.bind(this), this.timeout);
+		this.tm = setTimeout(this.checker.bind(this), this.timeout);
 	}
 	// resize detector <
 
@@ -92,7 +97,11 @@
 					draw();
 				}
 
-				new ResizeDetector(svg, onresize);
+				var r = new ResizeDetector(svg, onresize);
+				scope.$on('$destroy', function () {
+					r.destroy();
+					// destroy d3 drag?		
+				});
 
 				function update() {
 					if (!scope.options || !scope.points) { return; }
@@ -105,6 +114,7 @@
 
 				scope.$watch('points', update, true);
 				scope.$watch('options', update, true);
+
 
 
 				function setChartParameters() {
@@ -142,100 +152,9 @@
 
 
 					drag = d3.behavior.drag()
-						.on('dragstart', function () {
-
-							var t = d3.select(d3.event.sourceEvent.target);
-
-							if (!t.classed('readonly')) {
-								svg.classed('whileDragging', true);
-							}
-
-
-							var mX = t.attr('cx');
-							var mY = t.attr('cy');
-
-							var v = (yScale.invert(mY)).toFixed(scope.options.precision);
-
-							scope.$apply(function () {
-								scope.activePoint = {
-									index: t.attr('id').replace('circle_', '') * 1,
-									value: v * 1
-								}
-							});
-
-							popupText.text(v);
-
-							if (!scope.options.hidePopup) {
-								svgPopup
-									.style('display', 'block')
-									.style('transform', 'translate(' + (mX - popupSvgOffset.x) + 'px,' + (mY - popupSvgOffset.y) + 'px)')
-									.style('-webkit-transform', 'translate(' + (mX - popupSvgOffset.x) + 'px,' + (mY - popupSvgOffset.y) + 'px)');
-
-							}
-
-							var el = d3.select(this);
-							var params = el.attr('id').split("_");
-
-						})
-						.on('drag', function () {
-
-
-
-							var y = d3.event.y;
-							var x = d3.event.x;
-
-							var el = d3.select(this);
-
-							if (el.classed('readonly')) { return; }
-
-							var cy = el.attr('cy') * 1;
-							var cx = el.attr('cx') * 1;
-
-							// шаг
-							y = cy + Math.round((y - cy) / yStep) * yStep;
-
-							y = (y < yMax) ? yMax : y;
-							y = (y > yMin) ? yMin : y;
-
-							var params = el.attr('id').split("_");
-
-							scope.$apply(function () {
-								var v = (yScale.invert(y)).toFixed(scope.options.precision);
-								scope.points[params[1] * 1].value = v * 1;
-								redraw();
-
-								scope.activePoint = {
-									index: el.attr('id').replace('circle_', '') * 1,
-									value: v * 1
-								}
-
-								if (!scope.options.hidePopup) {
-									svgPopup.style('transform', 'translate(' + (cx - popupSvgOffset.x) + 'px,' + (cy - popupSvgOffset.y) + 'px)');
-									svgPopup.style('-webkit-transform', 'translate(' + (cx - popupSvgOffset.x) + 'px,' + (cy - popupSvgOffset.y) + 'px)');
-
-								}
-
-								popupText.text(v);
-
-
-							});
-
-						})
-						.on('dragend', function () {
-
-							svg.classed('whileDragging', false);
-
-							scope.$apply(function () {
-								scope.activePoint = null;
-							});
-
-							if (!scope.options.hidePopup) {
-								svgPopup.style('display', 'none');
-							}
-
-							var el = d3.select(this);
-							var params = el.attr('id').split("_");
-						});
+						.on('dragstart', dragstart)
+						.on('drag', dragging)
+						.on('dragend', dragend);
 
 				}
 
@@ -357,6 +276,101 @@
 					initilazed = true;
 
 				}
+
+				function dragstart() {
+
+					var t = d3.select(d3.event.sourceEvent.target);
+
+					if (!t.classed('readonly')) {
+						svg.classed('whileDragging', true);
+					}
+
+					var mX = t.attr('cx');
+					var mY = t.attr('cy');
+
+					var v = (yScale.invert(mY)).toFixed(scope.options.precision);
+
+					scope.$apply(function () {
+						scope.activePoint = {
+							index: t.attr('id').replace('circle_', '') * 1,
+							value: v * 1
+						}
+					});
+
+					popupText.text(v);
+
+					if (!scope.options.hidePopup) {
+						svgPopup
+							.style('display', 'block')
+							.style('transform', 'translate(' + (mX - popupSvgOffset.x) + 'px,' + (mY - popupSvgOffset.y) + 'px)')
+							.style('-webkit-transform', 'translate(' + (mX - popupSvgOffset.x) + 'px,' + (mY - popupSvgOffset.y) + 'px)');
+
+					}
+
+					var el = d3.select(this);
+					var params = el.attr('id').split("_");
+
+				}
+
+				function dragging() {
+
+					var y = d3.event.y;
+					var x = d3.event.x;
+
+					var el = d3.select(this);
+
+					if (el.classed('readonly')) { return; }
+
+					var cy = el.attr('cy') * 1;
+					var cx = el.attr('cx') * 1;
+
+					// шаг
+					y = cy + Math.round((y - cy) / yStep) * yStep;
+
+					y = (y < yMax) ? yMax : y;
+					y = (y > yMin) ? yMin : y;
+
+					var params = el.attr('id').split("_");
+
+					scope.$apply(function () {
+						var v = (yScale.invert(y)).toFixed(scope.options.precision);
+						scope.points[params[1] * 1].value = v * 1;
+						redraw();
+
+						scope.activePoint = {
+							index: el.attr('id').replace('circle_', '') * 1,
+							value: v * 1
+						}
+
+						if (!scope.options.hidePopup) {
+							svgPopup.style('transform', 'translate(' + (cx - popupSvgOffset.x) + 'px,' + (cy - popupSvgOffset.y) + 'px)');
+							svgPopup.style('-webkit-transform', 'translate(' + (cx - popupSvgOffset.x) + 'px,' + (cy - popupSvgOffset.y) + 'px)');
+
+						}
+
+						popupText.text(v);
+
+					});
+
+				}
+
+
+				function dragend() {
+
+					svg.classed('whileDragging', false);
+
+					scope.$apply(function () {
+						scope.activePoint = null;
+					});
+
+					if (!scope.options.hidePopup) {
+						svgPopup.style('display', 'none');
+					}
+
+					var el = d3.select(this);
+					var params = el.attr('id').split("_");
+				}
+
 
 
 			}
