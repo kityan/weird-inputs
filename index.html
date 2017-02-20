@@ -13,7 +13,7 @@
 			display: none !important;
 		}		
 	</style>
-	<link rel="stylesheet" href="lineChartInput.css" />
+	<link rel="stylesheet" href="../dist/lineChartInput.css" />
 </head>
 
 <body ng-controller="MainCtrl" style="font-size: 16px; padding: 30px;">
@@ -49,9 +49,15 @@
 		</div>
 	</div>
 
-	<script src="angular.min.js"></script>
-	<script src="d3.min.js"></script>
-	<script src="lineChartInput.js"></script>
+	<p style="clear: both;">Dynaimc resize</p>
+
+	<div style="width: 50%; height: 300px;">
+		<line-chart-input points="ratesData.points" options="ratesData.options"></line-chart-input>
+	</div>
+
+	<script src="./../node_modules/angular/angular.js"></script>
+	<script src="./../node_modules/d3/d3.js"></script>
+	<script src="./../dist/lineChartInput.js"></script>
 	<script src="demo.js"></script>
 
 </body>
