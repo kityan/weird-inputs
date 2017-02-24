@@ -50,7 +50,8 @@ gulp.task('clean', function (cb) {
 
 gulp.task('copy', ['clean'], function () {
 	return gulp.src([
-		'./src/**/*.js'
+		'./src/**/*.js',
+		'!./src/lineChartInput.js'
 	])
 	.pipe(gulp.dest('./dist/'));
 });
@@ -60,41 +61,21 @@ gulp.task('watch', function () {
 	gulp.watch('src/**/*.*', ['reload']);
 });
 
-gulp.task('concatJS', ['concatJS-worker'], function () {
+gulp.task('concatJS',  function () {
 	var files = [
-		'./src/misc.js',
-		'./src/filters.js',
-		'./src/inital-app.js',
-		'./src/services/**/*.*',
-		'./src/directives/**/*.*',
-		'./src/controllers/**/*.*'
+		'./src/lineChartInput.js'
 	];
 	return gulp.src(files)
 		.pipe(sourceMaps.init())	
-		.pipe(concat('app.js'))
+		.pipe(concat('lineChartInput.js'))
 		.on('error', swallowError)			
 		.pipe(uglify())
 		.on('error', swallowError)			
 		.pipe(sourceMaps.write())
-		.pipe(replace(/["']--DISABLE-WORKER--["']/g, false))
 		.pipe(gulp.dest('./dist/'));		
 });
 
 
-gulp.task('concatJS-worker', function () {
-	var files = [
-		'./src/inital-app-worker.js',
-		'./src/services/**/*.*'
-	];
-	return gulp.src(files)
-		.pipe(sourceMaps.init())	
-		.pipe(concat('app-worker.js'))
-		.on('error', swallowError)			
-		.pipe(uglify())
-		.on('error', swallowError)			
-		.pipe(sourceMaps.write())
-		.pipe(gulp.dest('./dist/'));
-});
 
 
 gulp.task('concatCSS', function () {
@@ -123,62 +104,21 @@ gulp.task('concatCSS_production', function () {
 		.pipe(gulp.dest('./dist/'));
 });
 
-gulp.task('concatJS_production', ['concatJS_production-worker'], function () {
+gulp.task('concatJS_production', function () {
 
 	var files = [
-		'./src/misc.js',
-		'./src/filters.js',
-		'./src/inital-app.js',
-		'./src/services/**/*.*',
-		'./src/directives/**/*.*',
-		'./src/controllers/**/*.*'
+		'./src/lineChartInput.js'
 	];
 
 	return gulp.src(files)
-		.pipe(concat('app.js'))
-		.on('error', swallowError)			
-		.pipe(uglify())
-		.on('error', swallowError)			
-		.pipe(replace(/["']--DISABLE-WORKER--["']/g, false))
-		.pipe(gulp.dest('./dist/'));
-
-});
-
-
-gulp.task('concatJS_production-worker', function () {
-	var files = [
-		'./src/inital-app-worker.js',
-		'./src/services/**/*.*'
-	];
-	return gulp.src(files)
-		.pipe(concat('app-worker.js'))
+		.pipe(concat('lineChartInput.js'))
 		.on('error', swallowError)			
 		.pipe(uglify())
 		.on('error', swallowError)			
 		.pipe(gulp.dest('./dist/'));
-});
-
-
-gulp.task('concatJS_production-standalone', ['concatJS_production-worker'], function () {
-
-	var files = [
-		'./src/misc.js',
-		'./src/filters.js',
-		'./src/inital-app.js',
-		'./src/services/**/*.*',
-		'./src/directives/**/*.*',
-		'./src/controllers/**/*.*'
-	];
-
-	return gulp.src(files)
-		.pipe(concat('app.js'))
-		.on('error', swallowError)			
-		.pipe(uglify())
-		.on('error', swallowError)			
-		.pipe(replace(/["']--DISABLE-WORKER--["']/g, true))
-		.pipe(gulp.dest('./dist/'));
 
 });
+
 
 
 gulp.task('devView', ['copy', 'concatJS', 'concatCSS', 'webserver', 'watch'], function(){
@@ -205,4 +145,3 @@ gulp.task('default', function(callback) {
 
 gulp.task('production', ['clean', 'copy', 'concatCSS_production', 'concatJS_production']);
 
-gulp.task('production-standalone', ['clean', 'copy', 'concatCSS_production', 'concatJS_production-standalone']);
