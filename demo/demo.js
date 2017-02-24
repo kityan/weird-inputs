@@ -43,11 +43,10 @@ app.controller('MainCtrl', ['$scope', function ($scope) {
 			max: 1300,
 			min: 1100,
 			grid: { x: 12, y: 4 },
-			hideGrid: { x: true },			
-			levels: [1200] // указание определённого уровня (например, при хеджировании)
+			hideGrid: { x: true },
+			level: 1180 // указание определённого уровня (например, при хеджировании)
 		}
 	};
-
 
 	$scope.ratesData = {
 		points: rates.map(mapFunction),
@@ -59,7 +58,7 @@ app.controller('MainCtrl', ['$scope', function ($scope) {
 			max: 1.5,
 			min: 1.1,
 			grid: { x: 12, y: 10 },
-			levels: [1.3] // указание определённого уровня (например, при хеджировании)
+			shortYearLabels: true
 		}
 	};
 
