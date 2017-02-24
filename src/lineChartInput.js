@@ -41,17 +41,13 @@
 
 			link: function (scope, elem, attrs) {
 
+				elem.addClass('lineChartInput');
+
 				var popupSvgOffset = {
 					x: 75,
 					y: 60
 				}
-
-				var arrays;
 				var paddings = { left: 80, right: 30, top: 30, bottom: 80 }
-				elem.addClass('lineChartInput');
-				var r = 3;
-				var topFactor = 1.5;
-				var bottomFactor = 0.5;
 				var pathClass = "line";
 				var xScale, yScale, yAxisGen, lineFun, drag, labelsPrecision, bottomLimit, yMax, yMin;
 				var d3 = $window.d3;
@@ -60,7 +56,6 @@
 				var svgPopup = d3.select(svgs[1]);
 				var svgWidth = parseInt(svg.style('width'));
 				var svgHeight = parseInt(svg.style('height'));
-				var topLabelDragLimiter = 10;
 				var yStep;
 				var popup, popupText;
 
@@ -113,9 +108,12 @@
 				}
 
 				scope.$watch('points', update, true);
-				scope.$watch('options', update, true);
 
-
+				scope.$watch('options', function () {
+					if (!scope.points) { return; }
+					svg.selectAll('*').remove();
+					draw();
+				}, true);
 
 				function setChartParameters() {
 
@@ -148,8 +146,7 @@
 						.scale(xScale)
 						.orient("bottom")
 						.tickValues(scope.points.map(function (el) { return el.dt; }))
-						.tickFormat(function (d) { return new Date(d).getFullYear() });
-
+						.tickFormat(function (d) { return (scope.options.shortYearLabels) ? ("'" + (new Date(d).getFullYear().toString().substr(2, 2))) : new Date(d).getFullYear() });
 
 					drag = d3.behavior.drag()
 						.on('dragstart', dragstart)
@@ -242,6 +239,23 @@
 							d: lineFun(scope.points),
 							class: pathClass
 						});
+
+					if (scope.options.level || scope.options.level === 0) {
+
+						svg.append("svg:line")
+							.attr('class', 'level')
+							.attr("x1", paddings.left - outGrid.yLeft)
+							.attr("y1", yScale(scope.options.level))
+							.attr("x2", svgWidth  + outGrid.yRight - paddings.right)
+							.attr("y2", yScale(scope.options.level));
+
+						svg.append("svg:text")
+							.attr('class', 'level')
+							.attr("alignment-baseline", "middle")
+							.attr("x", paddings.left - outGrid.yLeft - 9)
+							.attr("y", yScale(scope.options.level))
+							.text(d3.format(',')(scope.options.level));
+					}
 
 
 					svg.selectAll('circle.point')
