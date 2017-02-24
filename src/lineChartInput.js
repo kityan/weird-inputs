@@ -69,20 +69,6 @@
 
 				var initilazed = false;
 
-				/*
-			  
-				[+] доработать?
-			  
-				// http://stackoverflow.com/questions/17626555/responsive-d3-chart
-				svg
-				.attr("width", '100%')
-				.attr("height", '100%')
-				.attr('viewBox','0 0 '+Math.min(850,200)+' '+Math.min(850,200))
-				.attr('preserveAspectRatio','xMinYMin')
-				.append("g")
-				.attr("transform", "translate(" + Math.min(850,200) / 2 + "," + Math.min(850,200) / 2 + ")");
-				*/
-
 
 				function onresize() {
 					svgWidth = parseInt(svg.style('width'));
@@ -170,7 +156,7 @@
 				}
 
 
-				// сетка (переделать на http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html ?)
+
 				function drawGrid(yGrid, xGrid, hideGrid) {
 
 					var grid = svg.append("svg:g").attr('class', 'grid');
@@ -178,6 +164,7 @@
 					if (!hideGrid || !hideGrid.y) {
 						for (var i = 0; i <= yGrid; i++) {
 							var y = Math.round(i * (svgHeight - paddings.top - paddings.bottom) / (yGrid) + paddings.top);
+							if (scope.options.level && Math.abs(yScale(scope.options.level) - y) < 1) { continue; } // если рядом с линией сетки идёт левел, линию не рисуем
 							grid.append("svg:line")
 								.attr('class', 'yGrid')
 								.attr("x1", paddings.left - outGrid.yLeft)
@@ -246,7 +233,7 @@
 							.attr('class', 'level')
 							.attr("x1", paddings.left - outGrid.yLeft)
 							.attr("y1", yScale(scope.options.level))
-							.attr("x2", svgWidth  + outGrid.yRight - paddings.right)
+							.attr("x2", svgWidth + outGrid.yRight - paddings.right)
 							.attr("y2", yScale(scope.options.level));
 
 						svg.append("svg:text")
