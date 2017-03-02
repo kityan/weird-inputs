@@ -132,7 +132,10 @@
 						.scale(xScale)
 						.orient("bottom")
 						.tickValues(scope.points.map(function (el) { return el.dt; }))
-						.tickFormat(function (d) { return (scope.options.shortYearLabels) ? ("'" + (new Date(d).getFullYear().toString().substr(2, 2))) : new Date(d).getFullYear() });
+						.tickFormat(function (d) {
+							var y = new Date(d).getFullYear() - ((scope.options.baseYear) ? scope.options.baseYear : 0);
+							return (scope.options.shortYearLabels) ? ("'" + (y.toString().substr(2, 2))) : y;
+						});
 
 					drag = d3.behavior.drag()
 						.on('dragstart', dragstart)
